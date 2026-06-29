@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Move or Stay</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<style>
+    *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+body{
+    background:#f4f7fb;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:40px 20px;
+}
+
+h2{
+    color:#1e3a8a;
+    margin-bottom:30px;
+    font-size:2rem;
+}
+
+#predict-form{
+    width:100%;
+    max-width:520px;
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+.form-group{
+    margin-bottom:22px;
+}
+
+.form-group>label:first-child{
+    display:block;
+    margin-bottom:10px;
+    font-weight:600;
+    color:#334155;
+}
+
+input[type="number"]{
+    width:100%;
+    padding:12px;
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    font-size:15px;
+    transition:.2s;
+}
+
+input[type="number"]:focus{
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 4px rgba(37,99,235,.15);
+}
+
+/* radio 숨기기 */
+input[type="radio"]{
+    display:none;
+}
+
+/* 카드형 버튼 */
+input[type="radio"]+label{
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    min-width:120px;
+    padding:12px 18px;
+    margin-right:10px;
+    margin-top:6px;
+
+    border:2px solid #cbd5e1;
+    border-radius:12px;
+    background:white;
+
+    cursor:pointer;
+    transition:.25s;
+
+    color:#334155;
+    font-weight:600;
+}
+
+input[type="radio"]+label:hover{
+    border-color:#2563eb;
+    background:#eff6ff;
+}
+
+input[type="radio"]:checked+label{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:white;
+    border-color:#2563eb;
+    box-shadow:0 6px 18px rgba(37,99,235,.25);
+    transform:translateY(-2px);
+}
+
+.radio-group{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.25s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(37,99,235,.25);
+}
+
+button:active{
+    transform:translateY(0);
+}
+
+.result-box,
+.error-box{
+    width:100%;
+    max-width:520px;
+    margin-top:22px;
+    padding:24px;
+    border-radius:18px;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+.result-box{
+    background:#f0fdf4;
+    border-left:6px solid #22c55e;
+}
+
+.result-box h3{
+    color:#15803d;
+    margin-bottom:15px;
+}
+
+.result-box p{
+    margin:10px 0;
+    color:#334155;
+}
+
+.error-box{
+    background:#fef2f2;
+    border-left:6px solid #ef4444;
+}
+
+.error-box h3{
+    color:#dc2626;
+    margin-bottom:10px;
+}
+
+#error-message{
+    color:#991b1b;
+}
+
+#result-label{
+    font-weight:bold;
+    color:#15803d;
+    font-size:1.1rem;
+}
+
+#result-confidence{
+    font-weight:bold;
+    color:#2563eb;
+}
+
+.result-box.stay{
+    background:#eff6ff;
+    border-left:6px solid #2563eb;
+}
+
+.result-box.stay h3{
+    color:#1d4ed8;
+}
+
+.result-box.leave{
+    background:#fff7ed;
+    border-left:6px solid #f97316;
+}
+
+.result-box.leave h3{
+    color:#ea580c;
+}
+
+</style>
+<body>
+    <h2>직원 이직 예측기</h2>
+    <form id="predict-form">
+        <div class="form-group">
+            <label for="Age">나이</label>
+            <input type="number" step="1" name="Age" id="Age" value=30 required>
+        </div>
+        <div class="form-group">
+            <label>성별</label>
+
+            <div class="radio-group">
+                <input type="radio" name="Gender" id="Female" value="0" checked>
+                <label for="Female">👩 여성</label>
+
+                <input type="radio" name="Gender" id="Male" value="1">
+                <label for="Male">👨 남성</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>초과 근무</label>
+
+            <div class="radio-group">
+                <input type="radio" name="OverTime" id="OT_no" value="0" checked>
+                <label for="OT_no">🏠 없음</label>
+
+                <input type="radio" name="OverTime" id="OT_yes" value="1">
+                <label for="OT_yes">💼 있음</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="MonthlyIncome">월급 [단위: 만 원]</label>
+            <input type="number" step="0.1" name="MonthlyIncome" id="MonthlyIncome" value=240 required>
+        </div>
+        <button type="submit">이직 여부 예측하기</button>
+    </form>
+
+  <div class="result-box" id="result-box">
+    <h3>📊 추론 결과</h3>
+    <p><strong>예측 결과: </strong> <span id="result-label"></span></p>
+    <p><strong>예측 신뢰도 (Confidence):</strong> <span id="result-confidence"></span></p>
+  </div>
+
+  <div class="error-box" id="error-box">
+    <h3>Error</h3>
+    <p id="error-message"></p>
+  </div>
+</body>
+<script>
+$(function(){
+    $('#result-box').hide();
+    $('#error-box').hide();
+    $('#predict-form').on('submit', function(e){
+        e.preventDefault();  // 기본 기능 무시
+
+        var age = $("#Age").val();
+        var gender = $("input[name='Gender']:checked").val();
+        var OT = $("input[name='OverTime']:checked").val();
+        var income = $("#MonthlyIncome").val();
+        const result_text = ['잔류할 가능성이 높습니다.', '이직 가능성이 높습니다.']
+
+        // json 구조로 만들기 (서버랑 사전 협의가 되어야 한다)
+        const payload = {
+          features: [age, gender, OT, parseFloat(income)]
+        };
+        $.ajax({
+            url: '/predict', 
+            type: 'POST', 
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            dataType: 'json',
+            success: function(res){     // res: 백엔드의 return
+                $("#result-box")
+                    .removeClass("stay leave");
+
+                if(res.prediction == 0){
+                    $("#result-box").addClass("stay");
+                    $("#result-label").text("잔류");
+                }
+                else{
+                    $("#result-box").addClass("leave");
+                    $("#result-label").text("이직");
+                }
+                $('#result-label').text(result_text[res.prediction]);
+                $('#result-confidence').text(res.confidence);
+                $('#result-box').show();
+                $('#error-box').hide()
+            },
+            error: function(err) {
+                $('#error-message').text(err.responseText);
+                $('#error-box').show();
+                $('#result-box').hide();
+            }
+        })
+    })
+})
+</script>
+</html>
