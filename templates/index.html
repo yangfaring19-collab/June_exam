@@ -237,7 +237,7 @@ button:active{
 
   <div class="result-box" id="result-box">
     <h3>📊 추론 결과</h3>
-    <p><strong>예측 결과: </strong> <span id="result-label"></span></p>
+    <p><strong>예측 결과: </strong> <span id="result-icon"></span><span id="result-label"></span></p>
     <p><strong>예측 신뢰도 (Confidence):</strong> <span id="result-confidence"></span></p>
   </div>
 
@@ -275,11 +275,11 @@ $(function(){
 
                 if(res.prediction == 0){
                     $("#result-box").addClass("stay");
-                    $("#result-label").text("잔류");
+                    $("#result-icon").text("✅");
                 }
                 else{
                     $("#result-box").addClass("leave");
-                    $("#result-label").text("이직");
+                    $("#result-icon").text("⚠️");
                 }
                 $('#result-label').text(result_text[res.prediction]);
                 $('#result-confidence').text(res.confidence);
